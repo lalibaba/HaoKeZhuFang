@@ -1,15 +1,31 @@
-//首页页面接口
-import { recommendSongList, newSongList } from './home'
-//搜索页面接口
-import { hotSearchList, searchResult } from './search'
-//播放页面接口
-import { getSongById, getLyricById } from './play'
+//home
+import { swiper, groups, news } from "./home";
+//houses
+import { houses } from "./search";
+//area
+import { city, hotcity, infocity, community } from "./area";
+//user
+import { login, registered, user } from "./user";
+//houses
+import { condition } from "./houses";
 
-export const recommendSongListApi = recommendSongList
-export const newSongListApi = newSongList
-//搜索页面接口
-export const hotSearchListApi = hotSearchList
-export const searchResultApi = searchResult
+//home
+export const swiperApi = swiper;
+export const groupsApi = groups;
+export const newsApi = news;
+//houses
+export const housesApi = houses;
 
-export const getSongByIdAPI = getSongById
-export const getLyricByIdAPI = getLyricById
+//area
+export const cityAPI = city;
+export const hotcityAPI = hotcity;
+export const infocityAPI = infocity;
+export const communityAPI = community;
+
+//user
+export const loginAPI = login;
+export const registeredAPI = registered;
+export const userAPI = user;
+
+//houses
+export const conditionAPI = condition;

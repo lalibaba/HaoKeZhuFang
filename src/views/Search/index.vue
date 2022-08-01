@@ -1,203 +1,258 @@
 <template>
   <div>
-    <van-search
-      @input="inputfn"
-      v-model="value"
-      shape="round"
-      placeholder="请输入搜索关键词"
-    />
-    <!-- 搜索下容器 -->
-    <div class="search_wrap" v-if="songList.length == 0">
-      <!-- 标题 -->
-      <p class="hot_title">热门搜索</p>
-      <!-- 热搜关键词容器 -->
-      <div class="hot_name_wrap">
-        <!-- 每个搜索关键词 -->
-        <span
-          class="hot_item"
-          v-for="(item, index) in hotSearchList"
-          :key="index"
-          @click="hotfn(item.first)"
-          >{{ item.first }}</span
-        >
+    <div class="bannel">
+      <!-- 搜索 -->
+      <div class="top">
+        <i class="iconfont icon-back" @click="backfn"></i>
+        <div class="top1">
+          <div class="add" @click="addfn">{{ currentCity }}</div>
+          <i class="iconfont icon-arrow"></i>
+          <i class="iconfont icon-seach"></i>
+          <input type="text" name="" id="" placeholder="请输入小区或地址" />
+        </div>
+        <i class="iconfont icon-map"></i>
       </div>
     </div>
-    <div class="search_wrap" v-else>
-      <!-- 搜索结果 -->
-      <p class="hot_title">搜索结果</p>
-      <!-- -->
-      <!--v-model="refreshing" @refresh="onRefresh" -->
-      <!-- <van-pull-refresh v-model="refreshing" @refresh="onRefresh"> -->
+    <!-- 下拉菜单 -->
+    <van-dropdown-menu>
+      <!-- 1.区域筛选 -->
+      <van-dropdown-item v-model="value1" :options="option1"
+        ><van-picker toolbar-position="bottom" show-toolbar :columns="columns"
+      /></van-dropdown-item>
+      <!-- 2.方式筛选 -->
+      <van-dropdown-item v-model="value2" :options="option2" />
+      <!-- 3.租金筛选 -->
+      <van-dropdown-item v-model="value2" :options="option3" />
+      <!-- 4.其他筛选 -->
+      <van-dropdown-item v-model="value2" :options="option4" />
+    </van-dropdown-menu>
 
-      <van-list
-        v-model="loading"
-        :finished="finished"
-        finished-text="没有更多了"
-        @load="onLoad"
-      >
-        <Songitem
-          v-for="item in songList"
-          :key="item.id"
-          :name="item.name"
-          :author="item.ar[0].name"
-          :id="item.id"
-        ></Songitem>
-        <!-- <van-cell
-          center
-          v-for="obj in songList"
-          :key="obj.id"
-          :title="obj.name"
-          :label="`${obj.name}-${obj.ar[0].name}`"
+    <!-- 房源数据 -->
+    <van-card
+      v-for="(item, index) in housesList"
+      :key="index"
+      :price="item.price + ' 元 / 月'"
+      :desc="item.desc"
+      :title="item.title"
+      :thumb="'http://liufusong.top:8080' + item.houseImg"
+    >
+      <template #tags>
+        <van-tag
+          v-for="(it, index) in item.tags"
+          :key="index"
+          plain
+          type="danger"
+          >{{ it }}</van-tag
         >
-          <template #right-icon>
-            <van-icon name="play-circle-o" size="0.6rem" />
-          </template>
-        </van-cell> -->
-      </van-list>
-      <!-- </van-pull-refresh> -->
-    </div>
+      </template>
+    </van-card>
   </div>
 </template>
 
 <script>
-import { hotSearchListApi, searchResultApi } from '@/api'
+import { housesApi, infocityAPI, conditionAPI } from "@/api";
 export default {
-  name: 'App',
+  name: "App",
   data() {
     return {
-      value: '',
-      hotSearchList: [],
-      songList: [],
+      currentCity: this.$parent.$parent.currentCity,
+      columns: [],
+      value1: 0,
+      value2: "a",
+      value3: "a",
+      value4: "a",
+      option1: [{ text: "区域", value: 0 }],
+      option2: [{ text: "方式", value: "a" }],
+      option3: [{ text: "租金", value: "a" }],
+      option4: [{ text: "筛选", value: "a" }],
 
-      list: [],
-      loading: false,
-      finished: false,
-
-      limit: 20,
-      page: 1,
-      timer: null,
-    }
+      value: "",
+      housesList: [],
+    };
   },
   methods: {
-    async gethotSearchList() {
+    addfn() {
+      this.$router.push({
+        path: "/City",
+      });
+    },
+    backfn() {
+      this.$router.push({
+        path: "/Layout/Home",
+      });
+    },
+    async gethouses() {
       try {
-        const res = await hotSearchListApi()
-        // console.log(res.data.result.hots)
-        this.hotSearchList = res.data.result.hots
+        const res = await housesApi();
+        this.housesList = res.data.body.list;
+        // console.log(res.data.body.list)
       } catch (e) {
-        console.log(e)
+        console.log(e);
       }
     },
-    // getsearchResult() {
-    //   return searchResultApi({
-    //     keywords: this.value,
-    //   }).then(
-    //     (res) => {
-    //       return res || []
-    //     },
-    //     (err) => console.log(err)
-    //   )
-    // },
-    // inputfn() {
-    //   let list = this.getsearchResult()
 
-    //   console.log(list)
-    // },
-    async getsearchResult() {
+    //按条件获取所有信息
+
+    //请求获取所有城市id信息
+    async getinfocity() {
       try {
-        const res = await searchResultApi({
-          keywords: this.value,
-          limit: this.limit,
-          offset: (this.page - 1) * this.limit,
-        })
-        console.log(res)
-        return res
+        const res = await infocityAPI(this.currentCity);
+        let cityID = res.data.body.value;
+        //请求获取所有信息
+        const res2 = await conditionAPI(cityID);
+        console.log(res2.data.body);
+        let areaData = res2.data.body.area; //区域
+        let subwayData = res2.data.body.subway; //地铁
+        let areaChildren = []; //区域
+        let subwayChildren = []; //地铁
+        // 获取小区数据
+        for (let k in areaData.children) {
+          areaChildren[k] = {};
+          areaChildren[k].text = areaData.children[k].label;
+          areaChildren[k].children = [];
+          // 获取街区数据
+          for (let i in areaData.children[k].children) {
+            areaChildren[k].children[i] = {};
+            areaChildren[k].children[i].text =
+              areaData.children[k].children[i].label;
+          }
+        }
+        // 获取地铁数据
+        for (let k in subwayData.children) {
+          subwayChildren[k] = {};
+          subwayChildren[k].text = subwayData.children[k].label;
+          subwayChildren[k].children = [];
+          // 获取街区数据
+          for (let i in subwayData.children[k].children) {
+            subwayChildren[k].children[i] = {};
+            subwayChildren[k].children[i].text =
+              subwayData.children[k].children[i].label;
+          }
+        }
+        let Data = [];
+        Data[0] = {};
+        Data[0].text = "区域";
+        Data[0].children = areaChildren;
+        Data[1] = {};
+        Data[1].text = "地铁";
+        Data[1].children = subwayChildren;
+        this.columns = Data;
+        //请求获取城市小区信息
+        // const res2 = await communityAPI(this.currentCity, cityID);
+        // let result = res2.data.body;
+        // //小区和截取数组赋值
+        // let i = 0;
+        // // for (let key in result) {
+        // //   if (result.areaName) this.columns[i];
+        // // }
+
+        // console.log(result, this.columns[1].values, this.columns[2].values);
       } catch (e) {
-        console.log(e)
+        console.log(e);
       }
     },
-    async inputfn() {
-      //防抖
-      if (this.timer) clearTimeout(this.timer)
-      this.timer = setTimeout(async () => {
-        if (this.value.trim() == '') return (this.songList = [])
-        let res = await this.getsearchResult()
-        this.songList = (res.data.result && res.data.result.songs) || []
-      }, 1000)
-    },
-    async hotfn(val) {
-      this.value = val
-      let res = await this.getsearchResult()
-      this.songList = (res.data.result && res.data.result.songs) || []
-    },
-
-    async onLoad() {
-      this.page++
-      let res = await this.getsearchResult()
-      if (!res.data.result.songs) {
-        this.finished = true
-        this.loading = false
-        return
-      } else if ((this.page - 1) * this.limit >= res.data.result.songCount) {
-        this.finished = true
-        this.loading = false
-        return
-      } else {
-        this.songList.push(...res.data.result.songs)
-        // this.songList = [...this.songList, ...res.songs]
-        this.loading = false
-      }
-    },
-    // onRefresh() {
-    //   // 清空列表数据
-    //   this.finished = false
-
-    //   // 重新加载数据
-    //   // 将 loading 设置为 true，表示处于加载状态
-    //   this.loading = true
-    //   this.onLoad()
-    // },
   },
   mounted() {
-    this.gethotSearchList()
+    this.gethouses();
+    this.getinfocity();
   },
-}
+};
 </script>
 
 <style scoped>
-/* 搜索容器的样式 */
-.search_wrap {
-  padding: 0.266667rem;
+/* 房源顶部筛选样式 */
+:deep(.van-cell) {
+  display: none;
+}
+:deep(.van-picker__cancel) {
+  color: #21b97a;
+  flex: 1;
+}
+:deep(.van-picker__confirm) {
+  color: #fff;
+  background: #21b97a;
+  flex: 2;
 }
 
-/*热门搜索文字标题样式 */
-.hot_title {
-  font-size: 0.32rem;
-  color: #666;
+/* 房源数据右侧样式 */
+.van-card__price-currency {
+  display: none;
+}
+.van-card__title {
+  font-weight: bold;
+  font-size: 16px;
+}
+.van-card__price {
+  color: red;
+}
+.van-tag--danger.van-tag--plain {
+  color: #75d1dc;
+}
+.van-card__thumb {
+  flex: 2;
+}
+.van-card__content {
+  flex: 3;
 }
 
-/* 热搜词_容器 */
-.hot_name_wrap {
-  margin: 0.266667rem 0;
+/* 搜索栏的样式 */
+.icon-arrow {
+  font-size: 16px;
+  line-height: 24px;
+  padding-right: 10px;
+  border-right: 1px solid #000;
+}
+.icon-seach {
+  font-size: 16px;
+  line-height: 24px;
+  margin-left: 10px;
+}
+.icon-back {
+  font-size: 16px;
+  line-height: 24px;
+  margin: 0 10px;
+  color: #fff;
+}
+.icon-map {
+  font-size: 25px;
+  line-height: 24px;
+  margin: 0 10px;
+  color: #fff;
+}
+.bannel {
+  background-color: #21b97a;
+  height: 50px;
+
+  position: relative;
+}
+.top {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  height: 34px;
+
+  transform: translate(-50%, -50%);
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+.top1 {
+  padding: 0 10px;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  background-color: #fff;
+  font-size: 14px;
+  height: 34px;
+  border-radius: 5px;
+}
+.add {
+  line-height: 24px;
+  width: 35px;
 }
 
-/* 热搜词_样式 */
-.hot_item {
-  display: inline-block;
-  height: 0.853333rem;
-  margin-right: 0.213333rem;
-  margin-bottom: 0.213333rem;
-  padding: 0 0.373333rem;
-  font-size: 0.373333rem;
-  line-height: 0.853333rem;
-  color: #333;
-  border-color: #d3d4da;
-  border-radius: 0.853333rem;
-  border: 1px solid #d3d4da;
-}
-
-/* 给单元格设置底部边框 */
-.van-cell {
-  border-bottom: 1px solid lightgray;
+input {
+  margin: 0 5px;
+  border-color: rgba(0, 0, 0, 0);
 }
 </style>

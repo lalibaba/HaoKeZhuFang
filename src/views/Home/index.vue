@@ -1,80 +1,194 @@
 <template>
   <div>
-    <p class="title">推荐歌单</p>
-    <van-row gutter="10">
-      <van-col span="8" v-for="item in list" :key="item.id">
-        <van-image width="100" height="100" :src="item.picUrl" />
-        <p class="song_name">{{ item.name }}</p>
-      </van-col>
-    </van-row>
-    <p class="title">最新音乐</p>
-    <Songitem
-      v-for="item in newSong"
-      :key="item.id"
-      :name="item.name"
-      :author="item.song.artists[0].name"
-      :id="item.id"
-    ></Songitem>
-    <!-- <van-cell
-      center
-      v-for="obj in newSong"
-      :key="obj.id"
-      :title="obj.name"
-      :label="`${
-        obj.song &&
-        obj.song.artists &&
-        obj.song.artists[0] &&
-        obj.song.artists[0].name
-      }-${obj.name}`"
-    >
-      <template #right-icon>
-        <van-icon name="play-circle-o" size="0.6rem" />
-      </template>
-    </van-cell> -->
+    <div class="bannel">
+      <!-- 搜索 -->
+      <div class="top">
+        <div class="add" @click="addfn">{{ currentCity }}</div>
+        <i class="iconfont icon-arrow"></i>
+        <i class="iconfont icon-seach"></i>
+        <input type="text" name="" id="" placeholder="请输入小区或地址" />
+        <i class="iconfont icon-map"></i>
+      </div>
+      <van-swipe :autoplay="1000">
+        <van-swipe-item
+          style="height: 212px"
+          v-for="(item, index) in swiperlist"
+          :key="index"
+        >
+          <img
+            style="width: 100%"
+            v-lazy="'http://liufusong.top:8080' + item.imgSrc"
+          />
+        </van-swipe-item>
+      </van-swipe>
+    </div>
+    <!-- 租房list -->
+    <van-grid :border="false" :column-num="4" style="overflow: hidden">
+      <van-grid-item @click="findfn">
+        <van-image width="40px" height="40px" :src="img[0]" />
+        <div style="font-size: 14px; padding-top: 10px">
+          <p>整租</p>
+        </div>
+      </van-grid-item>
+      <van-grid-item @click="findfn">
+        <van-image width="40px" height="40px" :src="img[1]" />
+        <div style="font-size: 14px; padding-top: 10px">
+          <p>合租</p>
+        </div>
+      </van-grid-item>
+      <van-grid-item>
+        <van-image width="40px" height="40px" :src="img[2]" />
+        <div style="font-size: 14px; padding-top: 10px">
+          <p>地图找房</p>
+        </div>
+      </van-grid-item>
+      <van-grid-item>
+        <van-image width="40px" height="40px" :src="img[3]" />
+        <div style="font-size: 14px; padding-top: 10px">
+          <p>去出租</p>
+        </div>
+      </van-grid-item>
+    </van-grid>
+
+    <div class="title" style="display: flex; justify-content: space-between">
+      <p>租房小组</p>
+      <p>更多</p>
+    </div>
+    <van-grid :gutter="10" direction="horizontal" :column-num="2">
+      <van-grid-item v-for="(item, index) in groupslist" :key="index"
+        ><van-image
+          width="40px"
+          height="40px"
+          style="margin-right: 12px"
+          :src="'http://liufusong.top:8080' + item.imgSrc"
+        />
+        <div style="font-size: 14px">
+          <p>{{ item.title }}</p>
+          <p>{{ item.desc }}</p>
+        </div>
+      </van-grid-item>
+    </van-grid>
   </div>
 </template>
 
 <script>
-import { recommendSongListApi, newSongListApi } from '@/api'
+import img1 from "../../assets/imgs/1.png";
+import img2 from "../../assets/imgs/2.png";
+import img3 from "../../assets/imgs/3.png";
+import img4 from "../../assets/imgs/4.png";
+import { swiperApi, groupsApi } from "@/api";
 export default {
-  name: 'App',
+  name: "App",
   data() {
     return {
-      list: [],
-      newSong: [],
-    }
+      currentCity: this.$parent.$parent.currentCity,
+      swiperlist: [],
+      groupslist: [],
+      img: [img1, img2, img3, img4],
+    };
   },
   methods: {
-    async getrecommendSongList() {
+    addfn() {
+      this.$router.push({
+        path: "/City",
+      });
+    },
+    async getswiper() {
       try {
-        const res = await recommendSongListApi({
-          limit: 6,
-        })
-        this.list = res.data.result
-        // console.log(res.data)
+        const res = await swiperApi({});
+        this.swiperlist = res.data.body;
+        // console.log(res.data.body)
       } catch (e) {
-        console.log(e)
+        console.log(e);
       }
     },
-    async getnewSongList() {
+    async getgroups() {
       try {
-        const res = await newSongListApi()
-        this.newSong = res.data.result
-        console.log(res.data.result)
+        const res = await groupsApi();
+        this.groupslist = res.data.body;
+        // console.log(res.data.body)
       } catch (e) {
-        console.log(e)
+        console.log(e);
       }
+    },
+    findfn() {
+      this.$router.push({
+        path: "/Layout/Search",
+      });
     },
   },
   mounted() {
-    this.getrecommendSongList()
-    this.getnewSongList()
+    this.getswiper();
+    this.getgroups();
   },
-}
+};
 </script>
 
 <style scoped>
+body {
+  background-color: #eee;
+}
+.van-image {
+  width: 60px;
+  height: 60px;
+}
+.van-grid-item {
+  font-size: 16px;
+}
+.my-swipe .van-swipe-item {
+  color: #fff;
+  font-size: 20px;
+  text-align: center;
+  background-color: rgba(0, 0, 0, 0);
+}
+
+.icon-arrow {
+  font-size: 16px;
+  line-height: 24px;
+  padding-right: 10px;
+  border-right: 1px solid #000;
+}
+.icon-seach {
+  font-size: 16px;
+  line-height: 24px;
+  margin-left: 10px;
+}
+.icon-map {
+  font-size: 25px;
+  line-height: 24px;
+}
+.bannel {
+  position: relative;
+}
+
+.top {
+  z-index: 999;
+  padding: 0 10px;
+  position: absolute;
+  left: 10px;
+  top: 10px;
+  background-color: #fff;
+  height: 34px;
+  font-size: 14px;
+  display: flex;
+  margin: 20px 18px;
+  align-content: space-between;
+  align-items: center;
+  border-radius: 5px;
+}
+.add {
+  line-height: 24px;
+  width: 35px;
+}
+
+input {
+  margin: 0 5px;
+  width: 180px;
+  border-color: rgba(0, 0, 0, 0);
+}
+
 /* 标题 */
+
 .title {
   padding: 0.266667rem 0.24rem;
   margin: 0 0 0.24rem 0;

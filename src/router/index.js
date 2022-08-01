@@ -1,50 +1,76 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router'
+import Vue from "vue";
+import VueRouter from "vue-router";
 // 引入组件
-import Layout from '@/views/Layout'
-import Home from '@/views/Home'
-import Search from '@/views/Search'
-import Play from '@/views/Play'
+import Layout from "@/views/Layout";
+import Home from "@/views/Home";
+import Search from "@/views/Search";
+import City from "@/views/City";
+import Inform from "@/views/Inform";
+import My from "@/views/My";
+import Login from "@/views/Login";
+import Registered from "@/views/Registered";
 
-Vue.use(VueRouter)
+Vue.use(VueRouter);
 
 //配置规则
 
 const routes = [
   {
-    path: '/',
-    redirect: '/Layout',
+    path: "/",
+    redirect: "/Layout",
   },
   {
-    path: '/Layout',
+    path: "/Layout",
     component: Layout,
-    redirect: '/Layout/Home',
+    redirect: "/Layout/Home",
     children: [
       {
-        path: 'Home',
+        path: "Home",
         component: Home,
         meta: {
-          title: '首页',
+          title: "首页",
         },
       },
       {
-        path: 'Search',
+        path: "Search",
         component: Search,
         meta: {
-          title: '搜索',
+          title: "搜索",
+        },
+      },
+      {
+        path: "Inform",
+        component: Inform,
+        meta: {
+          title: "资讯",
+        },
+      },
+      {
+        path: "My",
+        component: My,
+        meta: {
+          title: "我的",
         },
       },
     ],
   },
   {
-    path: '/Play',
-    component: Play,
+    path: "/City",
+    component: City,
   },
-]
+  {
+    path: "/Login",
+    component: Login,
+  },
+  {
+    path: "/Registered",
+    component: Registered,
+  },
+];
 
 //创建路由器
 
 export default new VueRouter({
   routes,
-  mode: 'history',
-})
+  // mode: 'history',
+});

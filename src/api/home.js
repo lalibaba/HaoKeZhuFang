@@ -1,14 +1,18 @@
 import request from '@/utils/request'
 
-export const recommendSongList = (params) => {
+export const swiper = () => {
   return request({
-    url: '/personalized',
-    params,
+    url: '/home/swiper',
   })
 }
 
-export const newSongList = (params) =>
+export const groups = (params) =>
   request({
-    url: '/personalized/newsong',
+    url: '/home/groups',
+    params,
+  })
+export const news = (params) =>
+  request({
+    url: '/home/news',
     params,
   })
