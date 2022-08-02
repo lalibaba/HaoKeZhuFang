@@ -29,6 +29,7 @@
           v-for="(item, index) in gridlist"
           :key="index"
           :text="item.text"
+          @click="Fn(item.path)"
         >
           <template #icon>
             <p :class="'iconfont' + item.icon"></p>
@@ -46,7 +47,7 @@
 
 <script>
 import { Dialog } from "vant";
-import { loginAPI, userAPI } from "@/api";
+import { userAPI } from "@/api";
 export default {
   name: "App",
   computed: {
@@ -60,26 +61,32 @@ export default {
         {
           icon: " icon-coll",
           text: "我的收藏",
+          path: "/Favorites",
         },
         {
           icon: " icon-ind",
           text: "我的出租",
+          path: "/",
         },
         {
           icon: " icon-record",
           text: "看房记录",
+          path: "/",
         },
         {
           icon: " icon-identity",
           text: "成为房主",
+          path: "/",
         },
         {
           icon: " icon-myinfo",
           text: "个人资料",
+          path: "/",
         },
         {
           icon: " icon-cust",
           text: "练习我们",
+          path: "/",
         },
       ],
       userImg: "http://liufusong.top:8080/img/profile/avatar.png",
@@ -93,6 +100,11 @@ export default {
     };
   },
   methods: {
+    // 功能按钮跳转
+    Fn(path) {
+      this.$router.push(path);
+    },
+    // 去登录跳转
     loginFn() {
       this.$router.push({
         path: "/login",

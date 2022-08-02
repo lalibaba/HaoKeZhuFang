@@ -5,7 +5,7 @@ import { houses } from "./search";
 //area
 import { city, hotcity, infocity, community } from "./area";
 //user
-import { login, registered, user } from "./user";
+import { login, registered, user, favorites } from "./user";
 //houses
 import { condition } from "./houses";
 
@@ -26,6 +26,7 @@ export const communityAPI = community;
 export const loginAPI = login;
 export const registeredAPI = registered;
 export const userAPI = user;
+export const favoritesAPI = favorites;
 
 //houses
 export const conditionAPI = condition;

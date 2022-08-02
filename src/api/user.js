@@ -22,3 +22,11 @@ export const user = (token) =>
       authorization: token,
     },
   });
+// 获取用户收藏
+export const favorites = (token) =>
+  request({
+    url: "/user/favorites",
+    headers: {
+      authorization: token,
+    },
+  });

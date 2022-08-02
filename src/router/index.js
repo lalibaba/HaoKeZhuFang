@@ -9,6 +9,7 @@ import Inform from "@/views/Inform";
 import My from "@/views/My";
 import Login from "@/views/Login";
 import Registered from "@/views/Registered";
+import Favorites from "@/views/Favorites";
 
 Vue.use(VueRouter);
 
@@ -65,6 +66,10 @@ const routes = [
   {
     path: "/Registered",
     component: Registered,
+  },
+  {
+    path: "/Favorites",
+    component: Favorites,
   },
 ];
 

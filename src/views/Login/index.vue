@@ -74,11 +74,12 @@ export default {
         const Token = {};
         Token.token = res.data.body.token;
         this.$store.commit("TOKEN", Token);
+        console.log(res);
 
         if (res.data.status == 200) {
           this.$toast.success(res.data.description);
         } else if (res.data.status == 400) {
-          this.$toast(res.data.description);
+          this.$toast.fail(res.data.description);
         } else if (res.data.status == 401) {
           this.$toast(res.data.description);
         } else if (res.data.status == 404) {
@@ -88,7 +89,7 @@ export default {
         this.$router.push("./Layout/My");
       } catch (e) {
         console.log(e);
-        this.$toast(e);
+        this.$toast("你的账号或者密码异常");
       }
     },
   },
